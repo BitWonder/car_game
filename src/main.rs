@@ -1,6 +1,6 @@
-use std::intrinsics::mir::Return;
-
-use console::Term;
+use std::{io::{self, Write}, thread, time::Duration};
+// for keyboard
+use device_query::{DeviceQuery, DeviceState, Keycode};
 
 #[derive(Copy, Clone)]
 struct Keybindings {
@@ -30,6 +30,10 @@ impl Keybindings {
             _ => self.forward = self.forward
         }
     }
+
+    fn key_bind_change(&mut self) {
+        *self;
+    }
 }
 
 struct Car {
@@ -51,7 +55,19 @@ enum Pieces {
 }
 
 struct Game {
-    area: Vec<Vec<Pieces>>
+    area: Vec<Vec<Pieces>>,
+    car: Car,
+    need_new_game: bool
+}
+
+impl Game {
+    fn setup() -> Game {
+        Game { area: 8, car: Car::new(), need_new_game: true }
+    }
+
+    fn play(&mut self) {
+
+    }
 }
 
 enum State {
@@ -61,6 +77,49 @@ enum State {
     Exit
 }
 
-fn main() {
+fn clear_screen() {
+    // if windows or unix then clear screen
+    if cfg!(target_os = "windows") {
+        // clears the windows screen
+        std::process::Command::new("cmd")
+            .args(["/c", "cls"])
+            .spawn()
+            .expect("cls command failed to start")
+            .wait()
+            .expect("failed to wait");
+    } else {
+        // clears the unix screen
+        std::process::Command::new("clear")
+            .spawn()
+            .expect("clear command failed to start")
+            .wait()
+            .expect("failed to wait");
+    }
+}
 
+fn menuing() {
+
+}
+
+fn keys_down() -> Vec<Keycode> {
+    let device_state = DeviceState::new();
+    let keys: Vec<Keycode> = device_state.get_keys();
+    return keys;
+}
+
+fn main() {
+    let mut key_bin = Keybindings::default();
+    // start game in menu
+    let mut game_state = State::Menu;
+    //ready play
+    let mut game = Game::setup();
+
+    'game_loop : loop {
+        match game_state {
+            State::Menu => menuing(),
+            State::ChangeKeybindings => key_bin.key_bind_change(),
+            State::Exit => break 'game_loop,
+            _ => game.play()
+        }
+    }
 }
