@@ -1,3 +1,5 @@
+use std::intrinsics::mir::Return;
+
 use console::Term;
 
 #[derive(Copy, Clone)]
@@ -31,7 +33,16 @@ impl Keybindings {
 }
 
 struct Car {
-    
+    model: String,
+    speed: u8,
+    lane: u8,
+    acceleration: u8,
+}
+
+impl Car {
+    fn new() -> Car {
+        return Car { model : "()".to_string(), speed : 0, lane : 0, acceleration : 0 };
+    }
 }
 
 enum Pieces {
